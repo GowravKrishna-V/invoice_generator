@@ -222,7 +222,7 @@ class PdfInvoiceApi {
 
     return Row(
       mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: pw.CrossAxisAlignment.end,
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
         Text(title, style: style),
         SizedBox(width: 2 * PdfPageFormat.mm),

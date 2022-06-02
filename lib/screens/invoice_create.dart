@@ -22,6 +22,7 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> {
   TextEditingController fromCompany = TextEditingController();
   TextEditingController fromAddress = TextEditingController();
   TextEditingController dateController = TextEditingController();
+  TextEditingController descController = TextEditingController();
   TextEditingController prodName = TextEditingController();
   TextEditingController prodQuantity = TextEditingController();
   TextEditingController prodVat = TextEditingController();
@@ -77,7 +78,7 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> {
                     info: InvoiceInfo(
                       date: date,
                       dueDate: dueDate,
-                      description: 'My description...',
+                      description: descController.text,
                       number: '${DateTime.now().year}-9999',
                     ),
                     items: products,
@@ -97,6 +98,7 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
                     "Status: ",
@@ -107,7 +109,7 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> {
                   ),
                   Container(
                     padding:
-                        const EdgeInsets.symmetric(horizontal: 7, vertical: 1),
+                        const EdgeInsets.symmetric(horizontal: 58, vertical: 1),
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(15),
                         border: Border.all(color: Colors.grey.shade500)),
@@ -128,6 +130,7 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
                     "Expires in: ",
@@ -155,6 +158,7 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Padding(
@@ -205,6 +209,7 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Padding(
@@ -255,19 +260,24 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Description: ",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                  const Padding(
+                    padding: EdgeInsets.only(top: 8.0),
+                    child: Text(
+                      "Description: ",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                   SizedBox(
                     width: 200,
                     child: TextField(
-                      controller: dateController,
-                      keyboardType: TextInputType.number,
+                      controller: descController,
+                      keyboardType: TextInputType.text,
                       maxLines: 5,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
@@ -305,6 +315,9 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 5),
                       child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            primary: const Color(0xffEA5455),
+                            onPrimary: Colors.white),
                         onPressed: () {
                           Navigator.pop(context);
                         },
@@ -314,6 +327,9 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 5),
                       child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              primary: const Color(0xffEA5455),
+                              onPrimary: Colors.white),
                           onPressed: () {
                             products.add(
                               InvoiceItem(
@@ -324,6 +340,10 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> {
                                 unitPrice: double.parse(prodCost.text),
                               ),
                             );
+                            prodName.clear();
+                            prodQuantity.clear();
+                            prodVat.clear();
+                            prodCost.clear();
                             Navigator.pop(context);
                           },
                           child: const Text("Ok")),
