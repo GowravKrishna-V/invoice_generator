@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "197629797522",
+    "project_id": "my-invoice-gen-mini",
+    "storage_bucket": "my-invoice-gen-mini.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:197629797522:android:c0418f4edcc9681cde324b",
+        "android_client_info": {
+          "package_name": "com.example.invoice_generator"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "197629797522-ia9pqjmca7dugp2hd81ffpe3unohmq21.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDuMtR_f8fINDAhwDXSSs4oSRTgeZs3sfw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "197629797522-ia9pqjmca7dugp2hd81ffpe3unohmq21.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
