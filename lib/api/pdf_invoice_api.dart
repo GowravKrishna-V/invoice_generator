@@ -9,7 +9,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/widgets.dart';
 
 class PdfInvoiceApi {
-  static Future<File> generate(Invoice invoice) async {
+  static Future<File> generate(Invoice invoice, String fName) async {
     final pdf = Document();
 
     pdf.addPage(MultiPage(
@@ -24,7 +24,7 @@ class PdfInvoiceApi {
       footer: (context) => buildFooter(invoice),
     ));
 
-    return PdfApi.saveDocument(name: 'my_invoice.pdf', pdf: pdf);
+    return PdfApi.saveDocument(name: fName, pdf: pdf);
   }
 
   static Widget buildHeader(Invoice invoice) => Column(
@@ -71,13 +71,15 @@ class PdfInvoiceApi {
       'Invoice Number:',
       'Invoice Date:',
       'Payment Terms:',
-      'Due Date:'
+      'Due Date:',
+      'Status:',
     ];
     final data = <String>[
       info.number,
       Utils.formatDate(info.date),
       paymentTerms,
       Utils.formatDate(info.dueDate),
+      info.status,
     ];
 
     return Column(
@@ -210,7 +212,7 @@ class PdfInvoiceApi {
           SizedBox(height: 2 * PdfPageFormat.mm),
           buildSimpleText(title: 'Address', value: invoice.supplier.address),
           SizedBox(height: 1 * PdfPageFormat.mm),
-          buildSimpleText(title: 'Paypal', value: invoice.supplier.paymentInfo),
+          buildSimpleText(title: 'Mail', value: invoice.supplier.mailAddress),
         ],
       );
 

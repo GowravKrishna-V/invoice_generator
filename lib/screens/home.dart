@@ -4,21 +4,36 @@ import 'package:invoice_generator/screens/invoice_create.dart';
 import 'package:invoice_generator/screens/profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({Key? key, required this.user}) : super(key: key);
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
 
-  final User user;
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  Future getData() async {}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: ListView(
-          children: const [
-            InvoiceCard(),
-            InvoiceCard(),
-            InvoiceCard(),
-          ],
-        ),
+        child: FutureBuilder(
+            future: getData(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return ListView(
+                  children: const [
+                    InvoiceCard(
+                        invoiceNumber: "1",
+                        amount: 0.69,
+                        customerName: "Raj",
+                        status: "Overdue"),
+                  ],
+                );
+              } else {
+                return Center(child: CircularProgressIndicator());
+              }
+            }),
       ),
       floatingActionButton: Wrap(
         direction: Axis.horizontal,
@@ -28,7 +43,7 @@ class HomePage extends StatelessWidget {
             onPressed: () => Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => InvoiceGenerator(user: user),
+                  builder: (context) => InvoiceGenerator(),
                 )),
             backgroundColor: Color(0xffEA5455),
             child: const Icon(
@@ -41,10 +56,8 @@ class HomePage extends StatelessWidget {
           ),
           FloatingActionButton(
             heroTag: "btn2",
-            onPressed: () => Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => ProfilePage(user: user))),
+            onPressed: () => Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (context) => ProfilePage())),
             backgroundColor: Color(0xffEA5455),
             child: const Icon(
               Icons.person,

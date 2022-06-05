@@ -13,13 +13,18 @@ class AuthGate extends StatelessWidget {
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
-            return const SignInScreen(
+            return SignInScreen(
               providerConfigs: [
                 EmailProviderConfiguration(),
               ],
+              headerBuilder: (context, constraints, _) {
+                return Image(
+                    image: NetworkImage(
+                        "https://cdn.discordapp.com/attachments/981641781970104360/982700982918078554/InvLogo.png"));
+              },
             );
           }
-          return HomePage(user: snapshot.data!);
+          return ProfilePage();
         });
   }
 }

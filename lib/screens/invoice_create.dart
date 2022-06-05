@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:invoice_generator/api/pdf_api.dart';
 import 'package:invoice_generator/api/pdf_invoice_api.dart';
@@ -9,8 +11,7 @@ import 'package:invoice_generator/screens/home.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class InvoiceGenerator extends StatefulWidget {
-  const InvoiceGenerator({Key? key, required this.user}) : super(key: key);
-  final User user;
+  const InvoiceGenerator({Key? key}) : super(key: key);
   @override
   State<InvoiceGenerator> createState() => _InvoiceGeneratorState();
 }
@@ -19,8 +20,6 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> {
   String selectedValue = "Draft";
   TextEditingController toCompany = TextEditingController();
   TextEditingController toAddress = TextEditingController();
-  TextEditingController fromCompany = TextEditingController();
-  TextEditingController fromAddress = TextEditingController();
   TextEditingController dateController = TextEditingController();
   TextEditingController descController = TextEditingController();
   TextEditingController prodName = TextEditingController();
@@ -41,9 +40,7 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> {
                 onPressed: () => Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => HomePage(
-                        user: widget.user,
-                      ),
+                      builder: (context) => HomePage(),
                     )),
                 style: ElevatedButton.styleFrom(
                   primary: const Color(0xffF6F6F6),
@@ -55,7 +52,7 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> {
             Padding(
               padding: const EdgeInsets.all(10.0),
               child: ElevatedButton(
-                child: const Text('Invoice PDF'),
+                child: const Text('Save'),
                 style: ElevatedButton.styleFrom(
                   primary: const Color(0xffF6F6F6),
                   onPrimary: const Color(0xffEA5455),
@@ -64,36 +61,52 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> {
                   final date = DateTime.now();
                   final dueDate =
                       date.add(Duration(days: int.parse(dateController.text)));
+                  late Supplier supplier;
+                  await FirebaseFirestore.instance
+                      .collection('Suppliers')
+                      .where('uid',
+                          isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+                      .get()
+                      .then((snapshot) {
+                    supplier = Supplier.fromMap(snapshot.docs.first.data());
+                  });
+                  FirebaseFirestore.instance
+                      .collection('Invoices')
+                      .doc(FirebaseAuth.instance.currentUser!.uid)
+                      .collection('${FirebaseAuth.instance.currentUser!.email}')
+                      .add(Invoice(
+                        supplier: supplier,
+                        customer: Customer(
+                          name: toCompany.text,
+                          address: toAddress.text,
+                        ),
+                        info: InvoiceInfo(
+                          date: date,
+                          dueDate: dueDate,
+                          description: descController.text,
+                          number: '${DateTime.now().year}-9999',
+                          status: selectedValue,
+                        ),
+                        items: products,
+                      ).toMap());
 
-                  final invoice = Invoice(
-                    supplier: Supplier(
-                      name: fromCompany.text,
-                      address: fromAddress.text,
-                      paymentInfo: 'https://paypal.me/sarahfieldzz',
-                    ),
-                    customer: Customer(
-                      name: toCompany.text,
-                      address: toAddress.text,
-                    ),
-                    info: InvoiceInfo(
-                      date: date,
-                      dueDate: dueDate,
-                      description: descController.text,
-                      number: '${DateTime.now().year}-9999',
-                    ),
-                    items: products,
-                  );
+                  // final pdfFile = await PdfInvoiceApi.generate(invoice, "id");
 
-                  final pdfFile = await PdfInvoiceApi.generate(invoice);
-
-                  PdfApi.openFile(pdfFile);
+                  // PdfApi.openFile(pdfFile);
+                  dateController.clear();
+                  toAddress.clear();
+                  toCompany.clear();
+                  descController.clear();
+                  products.clear();
+                  selectedValue = "Draft";
+                  Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (context) => HomePage()));
                 },
               ),
             ),
           ],
         ),
         body: ListView(
-          shrinkWrap: true,
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
@@ -151,57 +164,6 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> {
                         hintText: 'Number of days',
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.only(top: 8.0),
-                    child: Text(
-                      "From: ",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  Column(
-                    children: [
-                      SizedBox(
-                        width: 200,
-                        child: TextField(
-                          controller: fromCompany,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            hintText: 'Company Name',
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      SizedBox(
-                        width: 200,
-                        child: TextField(
-                          controller: fromAddress,
-                          maxLines: 5,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            hintText: 'Address',
-                          ),
-                        ),
-                      ),
-                    ],
                   ),
                 ],
               ),
@@ -290,10 +252,109 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> {
                 ],
               ),
             ),
+            ...products
+                .map(
+                  (item) => Card(
+                    color: const Color(0xffEA5455),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
+                            child: Text(
+                              item.description,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 23,
+                              ),
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
+                                child: Text(
+                                  "Quantity: ",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                item.quantity.toString(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
+                                child: Text(
+                                  "Price: ",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                item.unitPrice.toString(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
+                                child: Text(
+                                  "VAT: ",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                item.vat.toString(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ],
+                          )
+                        ]),
+                  ),
+                )
+                .toList(),
             ElevatedButton(
-              onPressed: () => dialog(),
+              onPressed: () => {
+                dialog(),
+              },
               child: const Text("Add items"),
-              style: ElevatedButton.styleFrom(primary: const Color(0xffEA5455)),
+              style: ElevatedButton.styleFrom(
+                  primary: const Color(0xffFFB400),
+                  onPrimary: Color(0xff2D4059)),
             ),
           ],
         ),
@@ -331,15 +392,18 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> {
                               primary: const Color(0xffEA5455),
                               onPrimary: Colors.white),
                           onPressed: () {
-                            products.add(
-                              InvoiceItem(
-                                description: prodName.text,
-                                date: DateTime.now(),
-                                quantity: int.parse(prodQuantity.text),
-                                vat: double.parse(prodVat.text),
-                                unitPrice: double.parse(prodCost.text),
-                              ),
-                            );
+                            setState(() {
+                              products.add(
+                                InvoiceItem(
+                                  description: prodName.text,
+                                  date: DateTime.now(),
+                                  quantity: int.parse(prodQuantity.text),
+                                  vat: double.parse(prodVat.text),
+                                  unitPrice: double.parse(prodCost.text),
+                                ),
+                              );
+                            });
+
                             prodName.clear();
                             prodQuantity.clear();
                             prodVat.clear();
@@ -353,13 +417,8 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> {
               ],
               content: Builder(
                 builder: (context) {
-                  var height = MediaQuery.of(context).size.height;
-                  var width = MediaQuery.of(context).size.width;
-
                   return SizedBox(
-                    height: height - 570,
-                    width: width - 400,
-                    child: Column(children: [
+                    child: Column(mainAxisSize: MainAxisSize.min, children: [
                       SizedBox(
                         width: 200,
                         height: 50,
@@ -410,3 +469,100 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> {
             ));
   }
 }
+
+// ListView.builder(
+//                 shrinkWrap: true,
+//                 itemCount: products.length,
+//                 itemBuilder: (BuildContext context, int index) {
+//                   return Card(
+//                     color: const Color(0xffFFB400),
+//                     child: Column(
+//                         crossAxisAlignment: CrossAxisAlignment.start,
+//                         children: [
+//                           Padding(
+//                             padding: const EdgeInsets.symmetric(
+//                                 horizontal: 8, vertical: 4),
+//                             child: Text(
+//                               products[index].description,
+//                               style: const TextStyle(
+//                                 color: Color(0xff2D4059),
+//                                 fontWeight: FontWeight.bold,
+//                                 fontSize: 23,
+//                               ),
+//                             ),
+//                           ),
+//                           Row(
+//                             children: [
+//                               const Padding(
+//                                 padding: EdgeInsets.symmetric(
+//                                     horizontal: 8, vertical: 4),
+//                                 child: Text(
+//                                   "Quantity: ",
+//                                   style: TextStyle(
+//                                     color: Colors.white,
+//                                     fontWeight: FontWeight.bold,
+//                                     fontSize: 18,
+//                                   ),
+//                                 ),
+//                               ),
+//                               Text(
+//                                 (products[index].quantity).toString(),
+//                                 style: const TextStyle(
+//                                   color: Colors.white,
+//                                   fontWeight: FontWeight.bold,
+//                                   fontSize: 18,
+//                                 ),
+//                               ),
+//                             ],
+//                           ),
+//                           Row(
+//                             children: [
+//                               const Padding(
+//                                 padding: EdgeInsets.symmetric(
+//                                     horizontal: 8, vertical: 4),
+//                                 child: Text(
+//                                   "Price: ",
+//                                   style: TextStyle(
+//                                     color: Colors.white,
+//                                     fontWeight: FontWeight.bold,
+//                                     fontSize: 18,
+//                                   ),
+//                                 ),
+//                               ),
+//                               Text(
+//                                 (products[index].unitPrice).toString(),
+//                                 style: const TextStyle(
+//                                   color: Colors.white,
+//                                   fontWeight: FontWeight.bold,
+//                                   fontSize: 18,
+//                                 ),
+//                               ),
+//                             ],
+//                           ),
+//                           Row(
+//                             children: [
+//                               const Padding(
+//                                 padding: EdgeInsets.symmetric(
+//                                     horizontal: 8, vertical: 4),
+//                                 child: Text(
+//                                   "VAT: ",
+//                                   style: TextStyle(
+//                                     color: Colors.white,
+//                                     fontWeight: FontWeight.bold,
+//                                     fontSize: 18,
+//                                   ),
+//                                 ),
+//                               ),
+//                               Text(
+//                                 (products[index].vat).toString(),
+//                                 style: const TextStyle(
+//                                   color: Colors.white,
+//                                   fontWeight: FontWeight.bold,
+//                                   fontSize: 18,
+//                                 ),
+//                               ),
+//                             ],
+//                           )
+//                         ]),
+//                   );
+//                 }),

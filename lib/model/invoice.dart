@@ -13,6 +13,18 @@ class Invoice {
     required this.customer,
     required this.items,
   });
+  Invoice.fromMap(Map<String, dynamic> json)
+      : info = json['info'],
+        supplier = json['supplier'],
+        customer = json['customer'],
+        items = json['items'];
+
+  Map<String, dynamic> toMap() => {
+        'info': info.toMap(),
+        'supplier': supplier.toMap(),
+        'date': customer.toMap(),
+        'items': items.map((e) => e.toMap()).toList(),
+      };
 }
 
 class InvoiceInfo {
@@ -20,13 +32,29 @@ class InvoiceInfo {
   final String number;
   final DateTime date;
   final DateTime dueDate;
+  final String status;
 
   const InvoiceInfo({
     required this.description,
     required this.number,
     required this.date,
     required this.dueDate,
+    required this.status,
   });
+  InvoiceInfo.fromMap(Map<String, dynamic> json)
+      : description = json['description'],
+        number = json['number'],
+        date = json['date'],
+        dueDate = json['duedate'],
+        status = json['status'];
+
+  Map<String, dynamic> toMap() => {
+        'description': description,
+        'number': number,
+        'date': date,
+        'duedate': dueDate,
+        'status': status,
+      };
 }
 
 class InvoiceItem {
@@ -43,4 +71,19 @@ class InvoiceItem {
     required this.vat,
     required this.unitPrice,
   });
+
+  InvoiceItem.fromMap(Map<String, dynamic> json)
+      : description = json['description'],
+        date = json['date'],
+        quantity = json['quantity'],
+        vat = json['vat'],
+        unitPrice = json['unitprice'];
+
+  Map<String, dynamic> toMap() => {
+        'description': description,
+        'date': date,
+        'quantity': quantity,
+        'vat': vat,
+        'unitprice': unitPrice,
+      };
 }
