@@ -90,9 +90,6 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> {
                         items: products,
                       ).toMap());
 
-                  // final pdfFile = await PdfInvoiceApi.generate(invoice, "id");
-
-                  // PdfApi.openFile(pdfFile);
                   dateController.clear();
                   toAddress.clear();
                   toCompany.clear();

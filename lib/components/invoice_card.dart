@@ -1,24 +1,96 @@
 import 'dart:ffi';
 
 import 'package:flutter/material.dart';
+import 'package:invoice_generator/api/pdf_api.dart';
+import 'package:invoice_generator/api/pdf_invoice_api.dart';
 import 'package:invoice_generator/model/invoice.dart';
 
 class InvoiceCard extends StatelessWidget {
-  const InvoiceCard(
-      {Key? key,
-      required this.invoiceNumber,
-      required this.customerName,
-      required this.amount,
-      required this.status})
-      : super(key: key);
-  final String invoiceNumber;
-  final String customerName;
-  final double amount;
-  final String status;
+  const InvoiceCard({Key? key, required this.invoice}) : super(key: key);
+  final Invoice invoice;
+  Widget setStatus() {
+    if (invoice.info.status == "Overdue") {
+      return Row(
+        children: [
+          Icon(
+            Icons.circle,
+            size: 15,
+            color: Color(0xffEA5455),
+          ),
+          Text(
+            invoice.info.status,
+            style: TextStyle(
+              fontSize: 15,
+              color: Color(0xffEA5455),
+              fontWeight: FontWeight.bold,
+            ),
+          )
+        ],
+      );
+    } else if (invoice.info.status == "Paid") {
+      return Row(
+        children: [
+          Icon(
+            Icons.circle,
+            size: 15,
+            color: Colors.green,
+          ),
+          Text(
+            invoice.info.status,
+            style: TextStyle(
+              fontSize: 15,
+              color: Colors.green,
+              fontWeight: FontWeight.bold,
+            ),
+          )
+        ],
+      );
+    } else if (invoice.info.status == "Onhold") {
+      return Row(
+        children: [
+          Icon(
+            Icons.circle,
+            size: 15,
+            color: Colors.blue,
+          ),
+          Text(
+            invoice.info.status,
+            style: TextStyle(
+              fontSize: 15,
+              color: Colors.blue,
+              fontWeight: FontWeight.bold,
+            ),
+          )
+        ],
+      );
+    } else {
+      return Row(
+        children: [
+          Icon(
+            Icons.circle,
+            size: 15,
+            color: Colors.grey,
+          ),
+          Text(
+            invoice.info.status,
+            style: TextStyle(
+              fontSize: 15,
+              color: Colors.grey,
+              fontWeight: FontWeight.bold,
+            ),
+          )
+        ],
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {},
+    return InkWell(
+      onTap: () async {
+        final pdfFile = await PdfInvoiceApi.generate(invoice, "id");
+        PdfApi.openFile(pdfFile);
+      },
       child: Container(
         margin: const EdgeInsets.all(10),
         padding: const EdgeInsets.all(15),
@@ -43,7 +115,7 @@ class InvoiceCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  invoiceNumber,
+                  invoice.customer.name,
                   style: TextStyle(
                     fontSize: 30,
                     color: Color(0xff2D4059),
@@ -56,23 +128,7 @@ class InvoiceCard extends StatelessWidget {
                     color: Color(0xffF6F6F6),
                   ),
                   padding: EdgeInsets.all(3),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.circle,
-                        size: 15,
-                        color: Color(0xffEA5455),
-                      ),
-                      Text(
-                        status,
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: Color(0xffEA5455),
-                          fontWeight: FontWeight.bold,
-                        ),
-                      )
-                    ],
-                  ),
+                  child: setStatus(),
                 ),
               ],
             ),
@@ -80,7 +136,7 @@ class InvoiceCard extends StatelessWidget {
               height: 10,
             ),
             Text(
-              customerName,
+              invoice.info.description,
               style: TextStyle(
                 fontSize: 20,
                 color: Color(0xffF6F6F6),
@@ -91,7 +147,7 @@ class InvoiceCard extends StatelessWidget {
               height: 4,
             ),
             Text(
-              amount.toString(),
+              "${invoice.info.date.day}/${invoice.info.date.month}/${invoice.info.date.year}",
               style: TextStyle(
                 fontSize: 20,
                 color: Color(0xffF6F6F6),

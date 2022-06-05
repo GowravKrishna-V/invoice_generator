@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:invoice_generator/components/invoice_card.dart';
+import 'package:invoice_generator/model/invoice.dart';
 import 'package:invoice_generator/screens/invoice_create.dart';
 import 'package:invoice_generator/screens/profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -12,26 +14,39 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  Future getData() async {}
+  Future<List<Invoice>> getInvoices() async {
+    List<Invoice> invoices = [];
+    await FirebaseFirestore.instance
+        .collection('Invoices')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection('${FirebaseAuth.instance.currentUser!.email}')
+        .get()
+        .then((snapshot) {
+      invoices = snapshot.docs
+          .map<Invoice>((doc) => Invoice.fromMap(doc.data()))
+          .toList();
+    }).catchError((e) {
+      print(e);
+    });
+    return invoices;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: FutureBuilder(
-            future: getData(),
+        child: FutureBuilder<List<Invoice>>(
+            future: getInvoices(),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return ListView(
-                  children: const [
-                    InvoiceCard(
-                        invoiceNumber: "1",
-                        amount: 0.69,
-                        customerName: "Raj",
-                        status: "Overdue"),
-                  ],
-                );
+                    children: snapshot.data!
+                        .map((invoice) => InvoiceCard(
+                              invoice: invoice,
+                            ))
+                        .toList());
               } else {
-                return Center(child: CircularProgressIndicator());
+                return const Center(child: CircularProgressIndicator());
               }
             }),
       ),
