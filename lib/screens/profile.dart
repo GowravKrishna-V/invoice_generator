@@ -100,21 +100,30 @@ class _ProfilePageState extends State<ProfilePage> {
                     if (snapshot.hasData) {
                       return Column(
                         children: [
+                          const SizedBox(
+                            height: 15,
+                          ),
                           Text(
                             snapshot.data!.name,
                             style: const TextStyle(
                               color: Colors.black,
-                              fontSize: 30,
+                              fontSize: 25,
                               fontWeight: FontWeight.w500,
                             ),
+                          ),
+                          const SizedBox(
+                            height: 15,
                           ),
                           Text(
                             snapshot.data!.address,
                             style: const TextStyle(
                               color: Colors.black,
-                              fontSize: 30,
+                              fontSize: 25,
                               fontWeight: FontWeight.w500,
                             ),
+                          ),
+                          const SizedBox(
+                            height: 15,
                           ),
                           SizedBox(
                             width: 110,
@@ -130,8 +139,6 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                         ],
                       );
-                    } else if (snapshot.hasError) {
-                      return Text("Some Error Occured");
                     } else {
                       return Column(
                         children: [
