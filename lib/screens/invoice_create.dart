@@ -24,7 +24,7 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> {
   TextEditingController descController = TextEditingController();
   TextEditingController prodName = TextEditingController();
   TextEditingController prodQuantity = TextEditingController();
-  TextEditingController prodVat = TextEditingController();
+  TextEditingController gst = TextEditingController();
   TextEditingController prodCost = TextEditingController();
   List<InvoiceItem> products = [];
   @override
@@ -84,7 +84,7 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> {
                           date: date,
                           dueDate: dueDate,
                           description: descController.text,
-                          number: '${DateTime.now().year}-9999',
+                          number: supplier.gstNumber,
                           status: selectedValue,
                         ),
                         items: products,
@@ -249,6 +249,34 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> {
                 ],
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "GST: ",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 200,
+                    child: TextField(
+                      controller: gst,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        hintText: 'GST Percent',
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             ...products
                 .map(
                   (item) => Card(
@@ -322,7 +350,7 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> {
                                 padding: EdgeInsets.symmetric(
                                     horizontal: 8, vertical: 4),
                                 child: Text(
-                                  "VAT: ",
+                                  "GST: ",
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
@@ -395,7 +423,7 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> {
                                   description: prodName.text,
                                   date: DateTime.now(),
                                   quantity: int.parse(prodQuantity.text),
-                                  vat: double.parse(prodVat.text),
+                                  vat: double.parse(gst.text),
                                   unitPrice: double.parse(prodCost.text),
                                 ),
                               );
@@ -403,7 +431,6 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> {
 
                             prodName.clear();
                             prodQuantity.clear();
-                            prodVat.clear();
                             prodCost.clear();
                             Navigator.pop(context);
                           },
@@ -434,17 +461,6 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> {
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(
                             hintText: 'Quantity',
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 50,
-                        width: 200,
-                        child: TextField(
-                          controller: prodVat,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            hintText: 'Value added tax',
                           ),
                         ),
                       ),

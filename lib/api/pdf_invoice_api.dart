@@ -68,7 +68,7 @@ class PdfInvoiceApi {
   static Widget buildInvoiceInfo(InvoiceInfo info) {
     final paymentTerms = '${info.dueDate.difference(info.date).inDays} days';
     final titles = <String>[
-      'Invoice Number:',
+      'GST Number:',
       'Invoice Date:',
       'Payment Terms:',
       'Due Date:',
@@ -118,21 +118,17 @@ class PdfInvoiceApi {
   static Widget buildInvoice(Invoice invoice) {
     final headers = [
       'Description',
-      'Date',
       'Quantity',
       'Unit Price',
-      'VAT',
-      'Total'
+      'Total',
     ];
     final data = invoice.items.map((item) {
-      final total = item.unitPrice * item.quantity * (1 + item.vat);
+      final total = item.unitPrice * item.quantity;
 
       return [
         item.description,
-        Utils.formatDate(item.date),
         '${item.quantity}',
         '\$ ${item.unitPrice}',
-        '${item.vat} %',
         '\$ ${total.toStringAsFixed(2)}',
       ];
     }).toList();
@@ -150,7 +146,6 @@ class PdfInvoiceApi {
         2: Alignment.centerRight,
         3: Alignment.centerRight,
         4: Alignment.centerRight,
-        5: Alignment.centerRight,
       },
     );
   }
@@ -160,7 +155,7 @@ class PdfInvoiceApi {
         .map((item) => item.unitPrice * item.quantity)
         .reduce((item1, item2) => item1 + item2);
     final vatPercent = invoice.items.first.vat;
-    final vat = netTotal * vatPercent;
+    final vat = netTotal * (vatPercent / 100);
     final total = netTotal + vat;
 
     return Container(
@@ -179,7 +174,7 @@ class PdfInvoiceApi {
                   unite: true,
                 ),
                 buildText(
-                  title: 'Vat ${vatPercent * 100} %',
+                  title: 'GST ${vatPercent} %',
                   value: Utils.formatPrice(vat),
                   unite: true,
                 ),
