@@ -1,8 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:invoice_generator/api/pdf_api.dart';
-import 'package:invoice_generator/api/pdf_invoice_api.dart';
 import 'package:invoice_generator/model/customer.dart';
 import 'package:invoice_generator/model/invoice.dart';
 import 'package:invoice_generator/model/supplier.dart';
