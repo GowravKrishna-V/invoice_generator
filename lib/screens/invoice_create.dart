@@ -14,6 +14,7 @@ class InvoiceGenerator extends StatefulWidget {
 }
 
 class _InvoiceGeneratorState extends State<InvoiceGenerator> {
+  bool check = false;
   String selectedValue = "Draft";
   TextEditingController toCompany = TextEditingController();
   TextEditingController toAddress = TextEditingController();
@@ -55,46 +56,60 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> {
                   onPrimary: const Color(0xffEA5455),
                 ),
                 onPressed: () async {
-                  final date = DateTime.now();
-                  final dueDate =
-                      date.add(Duration(days: int.parse(dateController.text)));
-                  late Supplier supplier;
-                  await FirebaseFirestore.instance
-                      .collection('Suppliers')
-                      .where('uid',
-                          isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-                      .get()
-                      .then((snapshot) {
-                    supplier = Supplier.fromMap(snapshot.docs.first.data());
-                  });
-                  FirebaseFirestore.instance
-                      .collection('Invoices')
-                      .doc(FirebaseAuth.instance.currentUser!.uid)
-                      .collection('${FirebaseAuth.instance.currentUser!.email}')
-                      .add(Invoice(
-                        supplier: supplier,
-                        customer: Customer(
-                          name: toCompany.text,
-                          address: toAddress.text,
-                        ),
-                        info: InvoiceInfo(
-                          date: date,
-                          dueDate: dueDate,
-                          description: descController.text,
-                          number: supplier.gstNumber,
-                          status: selectedValue,
-                        ),
-                        items: products,
-                      ).toMap());
+                  check = checkStatus(
+                      toAddress.text,
+                      toCompany.text,
+                      dateController.text,
+                      descController.text,
+                      products.isNotEmpty);
+                  if (check == true) {
+                    final date = DateTime.now();
+                    final dueDate = date
+                        .add(Duration(days: int.parse(dateController.text)));
+                    late Supplier supplier;
+                    await FirebaseFirestore.instance
+                        .collection('Suppliers')
+                        .where('uid',
+                            isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+                        .get()
+                        .then((snapshot) {
+                      supplier = Supplier.fromMap(snapshot.docs.first.data());
+                    });
+                    FirebaseFirestore.instance
+                        .collection('Invoices')
+                        .doc(FirebaseAuth.instance.currentUser!.uid)
+                        .collection(
+                            '${FirebaseAuth.instance.currentUser!.email}')
+                        .add(Invoice(
+                          supplier: supplier,
+                          customer: Customer(
+                            name: toCompany.text,
+                            address: toAddress.text,
+                          ),
+                          info: InvoiceInfo(
+                            date: date,
+                            dueDate: dueDate,
+                            description: descController.text,
+                            number: supplier.gstNumber,
+                            status: selectedValue,
+                          ),
+                          items: products,
+                        ).toMap());
 
-                  dateController.clear();
-                  toAddress.clear();
-                  toCompany.clear();
-                  descController.clear();
-                  products.clear();
-                  selectedValue = "Draft";
-                  Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) => HomePage()));
+                    dateController.clear();
+                    toAddress.clear();
+                    toCompany.clear();
+                    descController.clear();
+                    products.clear();
+                    selectedValue = "Draft";
+                    Navigator.pushReplacement(context,
+                        MaterialPageRoute(builder: (context) => HomePage()));
+                  } else {
+                    fieldDialog();
+                  }
+                  setState(() {
+                    check = false;
+                  });
                 },
               ),
             ),
@@ -384,6 +399,48 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> {
     );
   }
 
+  Future fieldDialog() {
+    return showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(10),
+          ),
+        ),
+        title: Column(
+          children: [
+            Icon(Icons.error_rounded, size: 40, color: Colors.red),
+            SizedBox(
+              height: 5,
+            ),
+            Text("Alert"),
+          ],
+        ),
+        actions: [
+          Align(
+            alignment: AlignmentDirectional.center,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    primary: const Color(0xffEA5455), onPrimary: Colors.white),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text("Ok"),
+              ),
+            ),
+          ),
+        ],
+        content: Text(
+          "Please check the fields or add atleast a single item",
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+  }
+
   Future<String?> dialog() {
     return showDialog(
         context: context,
@@ -478,6 +535,18 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> {
               ),
             ));
   }
+}
+
+bool checkStatus(String toCompany, String toAddress, String dateController,
+    String descController, bool products) {
+  if ((toCompany != "") &&
+      (toAddress != "") &&
+      (dateController != "") &&
+      (descController != "") &&
+      (products == true)) {
+    return true;
+  }
+  return false;
 }
 
 // ListView.builder(
