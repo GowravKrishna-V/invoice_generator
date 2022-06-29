@@ -2,7 +2,7 @@
 
 This app helps to generate invoices digitally. These Invoices can be downloaded in PDF format.
 
-![Onboarding](https://cdn.discordapp.com/attachments/991683098699890688/991683103972139018/unknown.png "Onboarding Screen")
+![Onboarding](images/demo_1.jpeg)
 
 ![Signin](https://cdn.discordapp.com/attachments/991683098699890688/991683531883417640/unknown.png "Signin Screen")
 
