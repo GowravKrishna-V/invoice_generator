@@ -1,16 +1,17 @@
 # invoice_generator
 
-A new Flutter project.
+This app helps to generate invoices digitally. These Invoices can be downloaded in PDF format.
 
-## Getting Started
+![Onboarding](https://cdn.discordapp.com/attachments/991683098699890688/991683103972139018/unknown.png "Onboarding Screen")
 
-This project is a starting point for a Flutter application.
+![Signin](https://cdn.discordapp.com/attachments/991683098699890688/991683531883417640/unknown.png "Signin Screen")
 
-A few resources to get you started if this is your first Flutter project:
+![Signup](https://cdn.discordapp.com/attachments/991683098699890688/991683568134787072/unknown.png "Signup Screen")
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+![Profile](https://cdn.discordapp.com/attachments/991683098699890688/991683680747655178/unknown.png "Profile Screen")
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+![Home Screen](https://cdn.discordapp.com/attachments/991683098699890688/991683786381217842/unknown.png "Home Screen")
+
+![Add Invoice Screen](https://cdn.discordapp.com/attachments/991683098699890688/991683744371064952/unknown.png "Add Invoice Screen")
+
+![Invoice](https://cdn.discordapp.com/attachments/991683098699890688/991683835198701618/unknown.png "Invoice")
