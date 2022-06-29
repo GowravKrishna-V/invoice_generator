@@ -4,14 +4,14 @@ This app helps to generate invoices digitally. These Invoices can be downloaded 
 
 ![Onboarding](images/demo_1.jpeg)
 
-![Signin](https://cdn.discordapp.com/attachments/991683098699890688/991683531883417640/unknown.png "Signin Screen")
+![Signin](images/demo_2.jpeg)
 
-![Signup](https://cdn.discordapp.com/attachments/991683098699890688/991683568134787072/unknown.png "Signup Screen")
+![Signup](images/demo_3.jpeg)
 
-![Profile](https://cdn.discordapp.com/attachments/991683098699890688/991683680747655178/unknown.png "Profile Screen")
+![Profile](images/demo_4.jpeg)
 
-![Home Screen](https://cdn.discordapp.com/attachments/991683098699890688/991683786381217842/unknown.png "Home Screen")
+![Home Screen](images/demo_5.jpeg)
 
-![Add Invoice Screen](https://cdn.discordapp.com/attachments/991683098699890688/991683744371064952/unknown.png "Add Invoice Screen")
+![Add Invoice Screen](images/demo_6.jpeg)
 
-![Invoice](https://cdn.discordapp.com/attachments/991683098699890688/991683835198701618/unknown.png "Invoice")
+![Invoice](images/demo_7.jpeg)
