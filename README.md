@@ -1,11 +1,17 @@
-# invoice_generator
+# Invoice Generator
 
 This app helps to generate invoices digitally. These Invoices can be downloaded in PDF format.
 
-![Onboarding](images/demo_1.jpeg)
-![Signin](images/demo_2.jpeg)
-![Signup](images/demo_3.jpeg)
-![Profile](images/demo_4.jpeg)
-![Home Screen](images/demo_5.jpeg)
-![Add Invoice Screen](images/demo_6.jpeg)
-![Invoice](images/demo_7.jpeg)
+# Screenshots:
+<table>
+    <tr>
+        <td><img src="images/demo_1.jpeg" height=444 width=250></td>
+        <td><img src="images/demo_2.jpeg" height=444 width=250></td>
+        <td><img src="images/demo_3.jpeg" height=444 width=250></td>
+    </tr>
+    <tr>
+        <td><img src="images/demo_4.jpeg" height=444 width=250></td>
+        <td><img src="images/demo_5.jpeg" height=444 width=250></td>
+        <td><img src="images/demo_6.jpeg" height=444 width=250></td>
+    </tr>
+</table>
